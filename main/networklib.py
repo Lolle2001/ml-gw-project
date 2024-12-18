@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+import confusion as con
 from torch import optim
 import time
 
@@ -88,6 +89,7 @@ def train_model(model : nn.Module,
         correct_tn = 0
         precision = 0
         recall = 0
+        con_matrix = con.ConfusionMatrix(2)
 
         with torch.no_grad():
             for batch in val_loader:
@@ -99,14 +101,9 @@ def train_model(model : nn.Module,
                 val_loss += loss.item()
 
                 _, predicted = torch.max(outputs, 1)
-                mask_actual_0 = labels == 0
-                mask_actual_1 = labels == 1
-                mask_predicted_0 = predicted == 0
-                mask_predicted_1 = predicted == 1
-                correct_tp += (predicted[mask_predicted_0] == labels[mask_predicted_0]).sum().item() # True positive
-                correct_fp += (predicted[mask_predicted_0] != labels[mask_predicted_0]).sum().item() # False positive
-                correct_fn += (predicted[mask_predicted_1] != labels[mask_predicted_1]).sum().item() # False negative
-                correct_tn += (predicted[mask_predicted_1] == labels[mask_predicted_1]).sum().item() # True negative
+                clabels = labels.cpu().numpy()
+                cpredicted = predicted.cpu().numpy()
+                con_matrix.add(clabels, cpredicted)
                 
               
 
@@ -116,15 +113,10 @@ def train_model(model : nn.Module,
         train_loss /= len(train_loader)
         val_loss /= len(val_loader)
 
-        total_positive = correct_tp + correct_fp
-        total_negative = correct_tn + correct_fn
-        if total_positive > 0:
-            precision = correct_tp/total_positive
-        total_tpfn = correct_tp + correct_fn
-        if total_tpfn > 0:
-            recall = correct_tp/total_tpfn
-        accuracy = (correct_tp + correct_tn)/(total_negative+total_positive)
-      
+        con_matrix.calculate()
+        precision = con_matrix.precision
+        accuracy = con_matrix.accuracy
+        recall = con_matrix.recall
 
         
         loss_list.append(train_loss + val_loss)

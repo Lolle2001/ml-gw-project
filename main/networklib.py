@@ -48,10 +48,11 @@ def train_model(model : nn.Module,
                 train_loader : torch.tensor, 
                 val_loader  : torch.tensor, 
                 epochs : int =50, 
-                lr : float =0.001, 
+                lr : float =0.001,
+                weights : torch.tensor = None, 
                 device : str='cpu'):
     starttime = time.time()
-    criterion = nn.CrossEntropyLoss()  # Loss function for classification
+    criterion = nn.CrossEntropyLoss(weights)  # Loss function for classification
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     model = model.to(device)
@@ -90,6 +91,7 @@ def train_model(model : nn.Module,
         precision = 0
         recall = 0
         con_matrix = con.ConfusionMatrix(2)
+        # print(con_matrix.confusion_matrix.shape)
 
         with torch.no_grad():
             for batch in val_loader:
@@ -103,7 +105,7 @@ def train_model(model : nn.Module,
                 _, predicted = torch.max(outputs, 1)
                 clabels = labels.cpu().numpy()
                 cpredicted = predicted.cpu().numpy()
-                con_matrix.add(clabels, cpredicted)
+                con_matrix.add(clabels.astype(int), cpredicted.astype(int))
                 
               
 

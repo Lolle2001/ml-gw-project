@@ -3,6 +3,8 @@ from torch import nn
 import confusion as con
 from torch import optim
 import time
+import sklearn.utils as sku
+import numpy as np
 
 
 class GlitchClassifier(nn.Module):
@@ -39,27 +41,6 @@ class GlitchClassifierDynamic(nn.Module):
     def forward(self, x):
         return self.network(x)
 
-
-
-class GlitchModel():
-    def __init__(self, model : nn.Module, features : torch.tensor, labels: torch.tensor, device : str = "cpu"):
-        self.model = model
-        self.features = features
-        self.labels = labels
-        self.learning_rate : float= 0.00001
-        self.number_of_epochs : int = 1000
-        self.device  = device
-        self.train_set_fraction = 0.8
-        self.validation_set_fraction = 0.1
-        self.test_set_fraction = 0.1
-        self.class_weights = None
-    
-    def setup(self):
-        pass
-
-
-    def train(self):
-        pass
 
 
 def train_model(model : nn.Module,

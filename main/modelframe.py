@@ -6,6 +6,7 @@ import time
 import sklearn.utils as sku
 import numpy as np
 import os
+from IPython.display import display, clear_output
 
 
 class GlitchModel():
@@ -110,7 +111,7 @@ class GlitchModel():
             val_loss /= len(self.val_loader)
 
             con_matrix.calculate()
-            con_matrix_list.append(con_matrix)
+            con_matrix_list.append(con_matrix.confusion_matrix)
             precision = con_matrix.precision
             accuracy = con_matrix.accuracy
             recall = con_matrix.recall
@@ -121,9 +122,9 @@ class GlitchModel():
             recall_list.append(recall)
             accuracy_list.append(accuracy)
             train_loss_list.append(train_loss)
-
-            print(f"Epoch {epoch+1}/{self.number_of_epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, "
-                    f"Precision: {precision:.4f}, Recall: {recall:.4f}, Accuracy: {accuracy:.4f}")
+            clear_output(wait=True)
+            display(f"{(epoch+1)/self.number_of_epochs:03}%")
+            display(f"Epoch {epoch+1}/{self.number_of_epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, Accuracy: {accuracy:.4f}")
 
         end_time = time.time()
         print(f"Train time: {end_time - start_time}")

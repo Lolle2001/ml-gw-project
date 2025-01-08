@@ -161,3 +161,8 @@ class GlitchModel():
     def save_model(self, path, name):
         torch.save(self.model.state_dict(), os.path.join(path, name))
         
+    def save_settings(self):
+        # Add code to save settings for easy loading of framework and module.
+        # Can be done with .json.
+        pass
+        

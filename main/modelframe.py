@@ -5,6 +5,7 @@ from torch import optim
 import time
 import sklearn.utils as sku
 import numpy as np
+import os
 
 
 class GlitchModel():
@@ -28,29 +29,35 @@ class GlitchModel():
         self.class_weights = None
         self.dataset : torch.TensorDataset = None
         self.label_weight_set = label_weight_set
+        self.number_of_classes = len(label_weight_set)
         
         self.training_loss :  np.ndarray = np.array([])
         self.validiation_loss :  np.ndarray = np.array([])
         self.precision :  np.ndarray = np.array([])
         self.recall :  np.ndarray = np.array([])
         self.accuracy :  np.ndarray = np.array([])
+        
+        
     
-    def setup(self):
+    def setup(self, batchsize = 8192):
         self.dataset = torch.utils.data.TensorDataset(self.features, self.labels)
         self.train_size = int(self.train_set_fraction * len(self.dataset))
         self.val_size = int(self.validation_set_fraction * len(self.dataset))
         self.test_size = len(self.dataset) - self.train_size - self.val_size
         self.train_set, self.val_set, self.test_set = torch.utils.data.random_split(self.dataset, [self.train_size, self.val_size, self.test_size])
-        self.train_loader = torch.utils.data.DataLoader(self.train_set, batch_size=4128, shuffle=True)
-        self.val_loader = torch.utils.data.DataLoader(self.val_set, batch_size=4128, shuffle=True)
-        self.test_loader = torch.utils.data.DataLoader(self.test_set, batch_size=4128, shuffle=True)
-        temp_class_weights = sku.class_weight.compute_class_weight(self.label_weight_set, classes=np.array(self.label_weight_set.keys()), y=self.labels[self.train_set.indices])
+        self.train_loader = torch.utils.data.DataLoader(self.train_set, batch_size=batchsize, shuffle=True)
+        self.val_loader = torch.utils.data.DataLoader(self.val_set, batch_size=batchsize, shuffle=True)
+        self.test_loader = torch.utils.data.DataLoader(self.test_set, batch_size=batchsize, shuffle=True)
+        classes = np.array(list(self.label_weight_set.keys()))
+        class_weights = self.label_weight_set
+
+        temp_class_weights = sku.class_weight.compute_class_weight(class_weight=class_weights, classes=classes, y=self.labels[self.train_set.indices].numpy())
         self.class_weights = torch.tensor(temp_class_weights, dtype=torch.float32, device='cuda')
 
 
     def train(self):
         start_time = time.time()
-        criterion = nn.CrossEntropyLoss(weights)  # Loss function for classification
+        criterion = nn.CrossEntropyLoss(self.class_weights)  # Loss function for classification
         optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
 
         model = self.model.to(self.device)
@@ -80,7 +87,7 @@ class GlitchModel():
             # Validation phase
             model.eval()
             val_loss = 0.0
-            con_matrix = confusion.ConfusionMatrix(2)
+            con_matrix = confusion.ConfusionMatrix(self.number_of_classes)
 
             with torch.no_grad():
                 for batch in self.val_loader:
@@ -125,4 +132,32 @@ class GlitchModel():
         self.accuracy = np.array(accuracy_list)
         
 
+    def test_model(self):
+        self.model.eval()
+
+        correct_tp = 0
+        correct_fp = 0
+        correct_fn = 0
+        correct_tn = 0
+        test_precision = 0
+        test_recall = 0
+        con_matrix = confusion.ConfusionMatrix(self.number_of_classes)
+
+        for batch in self.test_loader:
+            inputs, labels = batch
+            inputs, labels = inputs.to(self.device), labels.to(self.device)
+            outputs = self.model(inputs)
+            _, predicted = torch.max(outputs, 1)
+            clabels = labels.cpu().numpy()
+            cpredicted = predicted.cpu().numpy()
+            con_matrix.add(clabels, cpredicted)
+            # print()
+
+        con_matrix.calculate()
+        self.test_accuracy = con_matrix.accuracy
+        self.test_precision = con_matrix.precision
+        self.test_recall = con_matrix.recall
+        
+    def save_model(self, path, name):
+        torch.save(self.model.state_dict(), os.path.join(path, name))
         

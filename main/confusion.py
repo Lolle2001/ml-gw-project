@@ -12,12 +12,16 @@ class ConfusionMatrix:
             self.accuracy= 0
             self.precision = 0
             self.recall= 0
+            self.specificity = 0
     
     def calculate(self):
         # print(self.true_class)
         for true, pred in zip(self.true_class, self.predicted_class):
             # print(true, pred)
             self.confusion_matrix[true,pred] += 1
+        
+        
+        
         
         true_positive = self.confusion_matrix[0,0]
         false_negative = self.confusion_matrix[0,1]
@@ -36,6 +40,10 @@ class ConfusionMatrix:
         total_2 = true_positive + false_positive
         if total_2 > 0:
             self.precision = (true_positive)/(total_2)
+        total_3 = true_negative + false_positive
+        if total_3 > 0:
+            self.specificity = (true_negative) / (total_3)
+
 
         # self.confusion_matrix = mt.confusion_matrix(self.true_class, self.predicted_class, labels = [0,1])
         # self.accuracy = mt.accuracy_score(self.true_class, self.predicted_class)

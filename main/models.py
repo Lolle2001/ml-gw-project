@@ -21,6 +21,24 @@ class GlitchClassifier(nn.Module):
     def forward(self, x):
         return self.network(x)
     
+class GlitchClassifier_MultiClass_Optimized(nn.Module):
+    def __init__(self, input_dim : int=6, hidden_dim :int=32, output_dim:int=2):
+        super(GlitchClassifier_MultiClass_Optimized, self).__init__()
+        self.network = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, int(hidden_dim/2)),
+            nn.ReLU(),
+            nn.Linear(int(hidden_dim/2), int(hidden_dim/4)),
+            nn.ReLU(),
+            nn.Linear(int(hidden_dim/4), output_dim),
+            # nn.Softmax(dim=1)  # Softmax for multi-class classification
+        )
+
+    def forward(self, x):
+        return self.network(x)
+    
+    
 
 class GlitchClassifierDynamic(nn.Module):
     def __init__(self, input_dim : int=6, hidden_dim :int=32, output_dim:int=2):

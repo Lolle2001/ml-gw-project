@@ -37,6 +37,8 @@ class GlitchModel():
         self.recall :  np.ndarray = np.array([])
         self.accuracy :  np.ndarray = np.array([])
         
+        self.con_matrix = None
+        
         
     
     def setup(self, batchsize = 8192):
@@ -67,6 +69,7 @@ class GlitchModel():
         recall_list = []
         accuracy_list = []
         train_loss_list = []
+        con_matrix_list = []
 
         for epoch in range(self.number_of_epochs):
             model.train()
@@ -107,6 +110,7 @@ class GlitchModel():
             val_loss /= len(self.val_loader)
 
             con_matrix.calculate()
+            con_matrix_list.append(con_matrix)
             precision = con_matrix.precision
             accuracy = con_matrix.accuracy
             recall = con_matrix.recall
@@ -130,6 +134,7 @@ class GlitchModel():
         self.precision = np.array(precision_list)
         self.recall = np.array(recall_list)
         self.accuracy = np.array(accuracy_list)
+        self.con_matrix_per_epoch = np.array(con_matrix_list)
         
 
     def test_model(self):
@@ -141,7 +146,7 @@ class GlitchModel():
         correct_tn = 0
         test_precision = 0
         test_recall = 0
-        con_matrix = confusion.ConfusionMatrix(self.number_of_classes)
+        self.con_matrix = confusion.ConfusionMatrix(self.number_of_classes)
 
         for batch in self.test_loader:
             inputs, labels = batch
@@ -150,13 +155,13 @@ class GlitchModel():
             _, predicted = torch.max(outputs, 1)
             clabels = labels.cpu().numpy()
             cpredicted = predicted.cpu().numpy()
-            con_matrix.add(clabels, cpredicted)
+            self.con_matrix.add(clabels, cpredicted)
             # print()
 
-        con_matrix.calculate()
-        self.test_accuracy = con_matrix.accuracy
-        self.test_precision = con_matrix.precision
-        self.test_recall = con_matrix.recall
+        self.con_matrix.calculate()
+        self.test_accuracy = self.con_matrix.accuracy
+        self.test_precision = self.con_matrix.precision
+        self.test_recall = self.con_matrix.recall
         
     def save_model(self, path, name):
         torch.save(self.model.state_dict(), os.path.join(path, name))

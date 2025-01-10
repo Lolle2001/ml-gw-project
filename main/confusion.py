@@ -14,46 +14,30 @@ class ConfusionMatrix:
             self.recall= 0
             self.specificity = 0
     
-    def calculate(self):
-        # print(self.true_class)
+    def fill(self):
         for true, pred in zip(self.true_class, self.predicted_class):
-            # print(true, pred)
             self.confusion_matrix[true,pred] += 1
+    
+    def calculate_properties(self, true_class = 0):
+        temp, precision, recall, class_accuracy = 0, 0, 0, 0
+        temp = self.confusion_matrix[true_class].sum()
+        if temp > 0:
+            recall    = self.confusion_matrix[true_class,true_class] / temp
+        temp = self.confusion_matrix[:,true_class].sum()
+        if temp > 0:
+            precision = self.confusion_matrix[true_class,true_class] / temp
+        temp = self.confusion_matrix.sum()
+        if temp > 0:
+            class_accuracy  = self.confusion_matrix[true_class,true_class] / temp
         
-        
-        
-        
-        true_positive = self.confusion_matrix[0,0]
-        false_negative = self.confusion_matrix[0,1]
-        false_positive = self.confusion_matrix[1,0]
-        true_negative = self.confusion_matrix[1,1]
-        # print(true_positive, false_negative)
-        # print(false_positive, true_negative)
-        total = self.confusion_matrix.sum()
-
-        self.accuracy = (true_positive + true_negative)/(total)
-
-
-        total_1 = true_positive + false_negative
-        if total_1 > 0:
-            self.recall = (true_positive)/(total_1)
-        total_2 = true_positive + false_positive
-        if total_2 > 0:
-            self.precision = (true_positive)/(total_2)
-        total_3 = true_negative + false_positive
-        if total_3 > 0:
-            self.specificity = (true_negative) / (total_3)
-
-
-        # self.confusion_matrix = mt.confusion_matrix(self.true_class, self.predicted_class, labels = [0,1])
-        # self.accuracy = mt.accuracy_score(self.true_class, self.predicted_class)
-        # self.recall = mt.recall_score(self.true_class, self.predicted_class)
-        # self.precision = mt.precision_score(self.true_class, self.predicted_class)
-
+            accuracy = np.trace(self.confusion_matrix) / temp
+        return recall, precision, accuracy, class_accuracy
+    
     def add(self, true: np.ndarray, predicted:np.ndarray):
         self.predicted_class = np.concatenate((self.predicted_class, predicted))
         self.true_class = np.concatenate((self.true_class, true))
 
+    
 
 # @nb.njit()
 # def calculate_confusion_matrix_opt( 

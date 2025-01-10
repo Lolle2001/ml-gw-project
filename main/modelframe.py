@@ -110,20 +110,19 @@ class GlitchModel():
             train_loss /= len(self.train_loader)
             val_loss /= len(self.val_loader)
 
-            con_matrix.calculate()
+            con_matrix.fill()
+            recall, precision, accuracy, _ = con_matrix.calculate_properties(true_class = 0)
             con_matrix_list.append(con_matrix.confusion_matrix)
-            precision = con_matrix.precision
-            accuracy = con_matrix.accuracy
-            recall = con_matrix.recall
+            
 
-            loss_list.append(train_loss + val_loss)
+            # loss_list.append(train_loss + val_loss)
             val_loss_list.append(val_loss)
             precision_list.append(precision)
             recall_list.append(recall)
             accuracy_list.append(accuracy)
             train_loss_list.append(train_loss)
             clear_output(wait=True)
-            display(f"{(epoch+1)/self.number_of_epochs:03}%")
+            display(f"{int((epoch+1)/self.number_of_epochs*100):03}%")
             display(f"Epoch {epoch+1}/{self.number_of_epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, Accuracy: {accuracy:.4f}")
 
         end_time = time.time()
@@ -159,10 +158,13 @@ class GlitchModel():
             self.con_matrix.add(clabels, cpredicted)
             # print()
 
-        self.con_matrix.calculate()
-        self.test_accuracy = self.con_matrix.accuracy
-        self.test_precision = self.con_matrix.precision
-        self.test_recall = self.con_matrix.recall
+        
+        self.con_matrix.fill()
+        test_recall, test_precision, test_accuracy, _ = self.con_matrix.calculate_properties(true_class = 0)
+       
+        self.test_recall    = test_recall   
+        self.test_precision = test_precision
+        self.test_accuracy  = test_accuracy 
         
     def save_model(self, path, name):
         torch.save(self.model.state_dict(), os.path.join(path, name))

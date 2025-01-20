@@ -19,7 +19,7 @@ class ConfusionMatrix:
             self.confusion_matrix[true,pred] += 1
     
     def calculate_properties(self, true_class = 0):
-        temp, precision, recall, class_accuracy = 0, 0, 0, 0
+        temp, precision, recall, class_accuracy, accuracy = 0, 0, 0, 0,0
         temp = self.confusion_matrix[true_class].sum()
         if temp > 0:
             recall    = self.confusion_matrix[true_class,true_class] / temp

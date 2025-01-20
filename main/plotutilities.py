@@ -2,28 +2,64 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import sklearn  as sk
+import modelframe as mf
 
-def plot_confusion_matrix_correlation(confusion_matrix):
-    """
-    Plots a correlation heatmap for the accuracy of an n x n confusion matrix.
+# def plot_confusion_matrix_correlation(confusion_matrix):
+#     """
+#     Plots a correlation heatmap for the accuracy of an n x n confusion matrix.
     
-    Parameters:
-    confusion_matrix (np.ndarray): The confusion matrix (n x n).
-    """
-    # Calculate the accuracy for each class
-    sk.metrics.ConfusionMatrixDisplay(confusion_matrix,normalize=True)
-    accuracy = np.diag(confusion_matrix) / confusion_matrix.sum(axis=1)
+#     Parameters:
+#     confusion_matrix (np.ndarray): The confusion matrix (n x n).
+#     """
+#     # Calculate the accuracy for each class
+#     sk.metrics.ConfusionMatrixDisplay(confusion_matrix,normalize=True)
+#     accuracy = np.diag(confusion_matrix) / confusion_matrix.sum(axis=1)
     
-    # Create a correlation matrix
-    correlation_matrix = np.outer(accuracy, accuracy)
+#     # Create a correlation matrix
+#     correlation_matrix = np.outer(accuracy, accuracy)
     
-    # Plot the correlation matrix
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap="coolwarm", xticklabels=range(confusion_matrix.shape[0]), yticklabels=range(confusion_matrix.shape[0]))
-    plt.title("Correlation Plot for Accuracy of Confusion Matrix")
-    plt.xlabel("Class")
-    plt.ylabel("Class")
-    plt.show()
+#     # Plot the correlation matrix
+#     plt.figure(figsize=(10, 8))
+#     sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap="coolwarm", xticklabels=range(confusion_matrix.shape[0]), yticklabels=range(confusion_matrix.shape[0]))
+#     plt.title("Correlation Plot for Accuracy of Confusion Matrix")
+#     plt.xlabel("Class")
+#     plt.ylabel("Class")
+#     plt.show()
+
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+def plot_confusion_matrix_correlation(frame : mf.GlitchModel):
+    
+    matrix : np.ndarray = frame.con_matrix_per_epoch[-1]
+    fig, ax = plt.subplots(1, 3, squeeze=False)
+    totalacc = np.trace(matrix)/np.sum(matrix)
+    
+    
+    
+    heatmap1 = sns.heatmap(matrix/np.sum(matrix, axis = 0), 
+                ax=ax[0,0],annot=True, fmt=".2f", cmap = 'coolwarm', xticklabels=range(matrix.shape[0]), yticklabels=range(matrix.shape[1]),cbar=False, vmin = 0, vmax = 1)
+    heatmap2 = sns.heatmap((matrix.T/np.sum(matrix.T, axis = 0)).T, 
+                ax=ax[0,1],annot=True, fmt=".2f", cmap = 'coolwarm', xticklabels=range(matrix.shape[0]), yticklabels=range(matrix.shape[1]),cbar=False, vmin = 0, vmax = 1)
+    heatmap3 = sns.heatmap(matrix/np.sum(matrix), 
+                ax=ax[0,2],annot=True, fmt=".2f", cmap = 'coolwarm', xticklabels=range(matrix.shape[0]), yticklabels=range(matrix.shape[1]),cbar=False, vmin = 0, vmax = 1)
+    ax[0,0].set_title("Recall")
+    ax[0,1].set_title("Precision")
+    ax[0,2].set_title(f"Class Accuracy, Total accuracy: {totalacc:.2f}")
+    
+    
+    
+    
+    for row in range(ax.shape[0]):
+        for col in range(ax.shape[1]):
+            ax[row,col].set_xlabel("Predicted")
+            ax[row,col].set_ylabel("True")
+            ax[row,col].set_aspect('equal')
+            
+    divider = make_axes_locatable(ax[0, 2])
+    cax = divider.append_axes("right", size = "5%")
+    colorbar = fig.colorbar(heatmap3.get_children()[0], cax=cax)
+    colorbar.set_label("Normalized Value", rotation=270, labelpad=15)
+    
+    return fig, ax
 
 # Example usage
 # confusion_matrix = np.array([[50, 2, 1], [10, 40, 5], [3, 4, 60]])

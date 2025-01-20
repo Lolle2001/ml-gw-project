@@ -69,3 +69,48 @@ def plot_confusion(ax,  epochs, confusion_matrix, true_class_label = 0):
     
     
     return ax
+
+
+from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+
+def plot_performance(frame):
+    epochs = np.arange(1, frame.number_of_epochs+1, 1)
+
+
+    fig, ax = plt.subplots(2, 1, squeeze=  False, figsize = (10, 4),sharex=True)
+    ax[0,0].plot(epochs, frame.training_loss + frame.validiation_loss, label = r"Total Loss", zorder= 1, color = "k")
+    ax[0,0].plot(epochs, frame.training_loss, label = r"Training Loss",zorder = 1, color = "tab:red")
+    ax[0,0].plot(epochs, frame.validiation_loss, label = r"Validation Loss",zorder = 1, color = "tab:blue")
+    ax[1,0].plot(epochs, frame.accuracy, label = r"Accuracy",zorder = 1, color = "k")
+    ax[1,0].plot(epochs, frame.precision, label = r"Precision",zorder = 1, color = "tab:red")
+    ax[1,0].plot(epochs, frame.recall, label = r"Recall",zorder = 1, color = "tab:blue")
+
+    ax[1,0].axhline(frame.test_accuracy, label = r"Accuracy(test)", zorder = 1, color = "k", linestyle = "dashed")
+    ax[1,0].axhline(frame.test_precision, label = r"Precision(test)", zorder = 1, color = "tab:red", linestyle = "dashed")
+    ax[1,0].axhline(frame.test_recall, label = r"Recall(test)", zorder = 1, color = "tab:blue", linestyle = "dashed")
+
+    # ax[0,0].axhline((total_loss).mean(),zorder= 0,color = "k", linestyle = "dotted")
+    # ax[0,0].axhline((total_accuracy).mean(),zorder= 0,color = "k", linestyle = "dotted")
+    ax[0,0].set_ylabel(r"Value")
+    ax[1,0].set_ylabel(r"Value")
+    for i in range(2):
+        ax[i,0].tick_params(axis="y",direction="in",which="both")
+        ax[i,0].tick_params(axis="x",direction="in",which="both")
+        # ax[i,0].set_yticks(np.arange(0, np.max(total_loss), int(np.max(total_loss)) /10))
+        ax[i,0].set_xticks(np.arange(0, frame.number_of_epochs + 1, frame.number_of_epochs // 10))
+        ax[i,0].xaxis.set_minor_locator(MultipleLocator(frame.number_of_epochs//50))
+        ax[i,0].yaxis.set_minor_locator(AutoMinorLocator())
+    ax[1,0].set_xlabel(r"Epoch")
+    # ax[0,0].set_ylabel("Value")
+    ax[0,0].set_xlim(0, frame.number_of_epochs)
+    ax[0,0].set_ylim(0, np.max(frame.training_loss + frame.validiation_loss))
+    ax[1,0].set_ylim(0, 1.2)
+    ax[0,0].legend(frameon=False, ncol=1, bbox_to_anchor=(1, 1), loc='upper left')
+    ax[1,0].legend(frameon=False, ncol=1, bbox_to_anchor=(1, 1), loc='upper left')
+    fig.subplots_adjust(hspace=0.1)
+    return fig, ax
+
+
+
+
+# ax[0,0].grid(True,which="minor")

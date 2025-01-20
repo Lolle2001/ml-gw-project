@@ -7,6 +7,7 @@ import sklearn.utils as sku
 import numpy as np
 import os
 from IPython.display import display, clear_output
+import datautilities as du
 
 
 class GlitchModel():
@@ -43,6 +44,7 @@ class GlitchModel():
         
     
     def setup(self, batchsize = 8192):
+        # self.labels = torch.argmax(self.labels, dim=1)
         self.dataset = torch.utils.data.TensorDataset(self.features, self.labels)
         self.train_size = int(self.train_set_fraction * len(self.dataset))
         self.val_size = int(self.validation_set_fraction * len(self.dataset))
@@ -58,10 +60,10 @@ class GlitchModel():
         self.class_weights = torch.tensor(temp_class_weights, dtype=torch.float32, device='cuda')
 
 
-    def train(self):
+    def train(self, underfit_mode = False):
         start_time = time.time()
         criterion = nn.CrossEntropyLoss(self.class_weights)  # Loss function for classification
-        optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
+        optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate, weight_decay=1E-5)
 
         model = self.model.to(self.device)
         loss_list = []
@@ -78,8 +80,24 @@ class GlitchModel():
 
             for batch in self.train_loader:
                 inputs, labels = batch
+                if underfit_mode== True:
+                    # inputs, labels = du.noise_data_reduction(inputs, labels, {0:True, 1 : False, 2 : False, 3: False,4:False, 5:False, 6 :False})
+                    noise_mask = labels > 0
+                    data_mask = noise_mask == False
+                    
+                    perm = torch.randperm(data_mask.sum())
+                    
+                    new_noise_input = inputs[noise_mask][perm]
+                    new_noise_label = labels[noise_mask][perm]
+                    new_data_input = inputs[data_mask]
+                    new_data_label = labels[data_mask]
+                    
+                    inputs = torch.cat([new_noise_input, new_data_input])
+                    labels = torch.cat([new_noise_label, new_data_label])
+                    
+                
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
-
+                
                 optimizer.zero_grad()
                 outputs = model(inputs)
                 loss = criterion(outputs, labels)

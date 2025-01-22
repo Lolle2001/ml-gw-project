@@ -207,7 +207,13 @@ class GlitchModel():
             "training_loss" : self.training_loss.tolist(),
             "validation_loss" : self.validiation_loss.tolist(),
             "confusion_matrix_per_epoch" : self.con_matrix_per_epoch.tolist(),
-            "confusion_matrix_test" : self.con_matrix.confusion_matrix.tolist()
+            "confusion_matrix_test" : self.con_matrix.confusion_matrix.tolist(),
+            "accuracy_per_epoch" : self.accuracy.tolist(),
+            "accuracy_test" : self.test_accuracy,
+            "precision_per_epoch" : self.precision.tolist(),
+            "precision_test" : self.test_precision,
+            "recall_per_epoch" : self.recall.tolist(),
+            "recall_test" : self.test_recall,
         }
         
         with open(os.path.join(path, "model_settings.json"), "w") as file:
@@ -217,20 +223,42 @@ class GlitchModel():
             json.dump(results_dict, file, indent=4, separators=(',', ': '))
         
         
-    def read_result_data(self,directory : str):
+    def read_result_data(self, directory: str):
+        """
+        Reads the settings and results data from JSON files in the specified directory
+        and populates the class attributes.
+        """
         settings_dict = None
         results_dict = None
+
+        # Read the model settings
         with open(os.path.join(directory, "model_settings.json"), "r") as file:
             settings_dict = json.load(file)
-            
-        with open(os.path.join(directory, "model_settings.json"), "r") as file:
+
+        # Read the model results
+        with open(os.path.join(directory, "model_results.json"), "r") as file:
             results_dict = json.load(file)
-        
-        self.train
-        
-        pass
-        
-        
+
+        # Populate class attributes from settings_dict
+        self.learning_rate = settings_dict["learning_rate"]
+        self.number_of_epochs = settings_dict["number_of_epochs"]
+        self.train_set_fraction = settings_dict["train_fraction_size"]
+        self.validation_set_fraction = settings_dict["validation_fraction_size"]
+        self.test_set_fraction = settings_dict["test_fraction_size"]
+        self.class_weights = torch.tensor(settings_dict["class_weights"], dtype=torch.float32, device=self.device)
+        self.label_weight_set = settings_dict["label_weights"]
+        self.number_of_classes = settings_dict["number_of_classes"]
+
+        # Populate class attributes from results_dict
+        self.training_loss = np.array(results_dict["training_loss"])
+        self.validiation_loss = np.array(results_dict["validation_loss"])
+        self.con_matrix_per_epoch = np.array(results_dict["confusion_matrix_per_epoch"])
+        self.con_matrix = confusion.ConfusionMatrix(self.number_of_classes)
+        self.con_matrix.confusion_matrix = np.array(results_dict["confusion_matrix_test"])
+
+        # Optional: Log or print information if needed
+        print("Model settings and results successfully loaded.")
+            
     def save_settings(self):
         # Add code to save settings for easy loading of framework and module.
         # Can be done with .json.

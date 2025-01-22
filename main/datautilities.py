@@ -52,3 +52,6 @@ def read_in_data(directory : str, conversion_dict : dict[int,int] = {0:0,1:1,2:2
         labels[labels == original] = new
     return torch.tensor(features).float(), torch.tensor(labels).long()
 
+
+
+    

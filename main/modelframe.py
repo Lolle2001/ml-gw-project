@@ -217,6 +217,19 @@ class GlitchModel():
             json.dump(results_dict, file, indent=4, separators=(',', ': '))
         
         
+    def read_result_data(self,directory : str):
+        settings_dict = None
+        results_dict = None
+        with open(os.path.join(directory, "model_settings.json"), "r") as file:
+            settings_dict = json.load(file)
+            
+        with open(os.path.join(directory, "model_settings.json"), "r") as file:
+            results_dict = json.load(file)
+        
+        self.train
+        
+        pass
+        
         
     def save_settings(self):
         # Add code to save settings for easy loading of framework and module.

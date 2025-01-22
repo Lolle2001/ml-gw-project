@@ -253,8 +253,15 @@ class GlitchModel():
         self.training_loss = np.array(results_dict["training_loss"])
         self.validiation_loss = np.array(results_dict["validation_loss"])
         self.con_matrix_per_epoch = np.array(results_dict["confusion_matrix_per_epoch"])
+        self.accuracy = np.array(results_dict["accuracy_per_epoch"])
+        self.test_accuracy = results_dict["accuracy_test"]
+        self.precision = np.array(results_dict["precision_per_epoch"])
+        self.test_precision = results_dict["precision_test"]
+        self.recall = np.array(results_dict["recall_per_epoch"])
+        self.test_recall = results_dict["recall_test"]
         self.con_matrix = confusion.ConfusionMatrix(self.number_of_classes)
         self.con_matrix.confusion_matrix = np.array(results_dict["confusion_matrix_test"])
+        
 
         # Optional: Log or print information if needed
         print("Model settings and results successfully loaded.")

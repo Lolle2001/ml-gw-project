@@ -55,3 +55,11 @@ def read_in_data(directory : str, conversion_dict : dict[int,int] = {0:0,1:1,2:2
 
 
     
+def get_recall(matrix):
+    return (matrix.T/np.sum(matrix, axis=1)).T
+
+def get_precision(matrix):
+    return (matrix/np.sum(matrix, axis = 0))
+
+def get_accuracy(matrix):
+    return matrix/np.sum(matrix)

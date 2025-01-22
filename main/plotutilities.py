@@ -5,12 +5,15 @@ import sklearn  as sk
 import modelframe as mf
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
+import datautilities as du
 
 def plot_recall_matrix(frame : mf.GlitchModel):
     matrix : np.ndarray = frame.con_matrix_per_epoch[-1]
     fig, ax = plt.subplots(1, 1, squeeze=False)
-    heatmap = sns.heatmap(matrix/np.sum(matrix, axis = 0), 
+    
+    recall = du.get_recall(matrix)
+    
+    heatmap = sns.heatmap(recall, 
                 ax=ax[0,0],annot=True, fmt=".2f", cmap = 'coolwarm', xticklabels=range(matrix.shape[0]), yticklabels=range(matrix.shape[1]),cbar=False, vmin = 0, vmax = 1)
     for row in range(ax.shape[0]):
         for col in range(ax.shape[1]):
@@ -29,7 +32,10 @@ def plot_accuracy_matrix(frame: mf.GlitchModel):
     matrix : np.ndarray = frame.con_matrix_per_epoch[-1]
     fig, ax = plt.subplots(1, 1, squeeze=False)
     totalacc = np.trace(matrix)/np.sum(matrix)
-    heatmap = sns.heatmap(matrix/np.sum(matrix), 
+    
+    accuracy = du.get_accuracy(matrix)
+    
+    heatmap = sns.heatmap(accuracy, 
                 ax=ax[0,0],annot=True, fmt=".2f", cmap = 'coolwarm', xticklabels=range(matrix.shape[0]), yticklabels=range(matrix.shape[1]),cbar=False, vmin = 0, vmax = 1)
     for row in range(ax.shape[0]):
         for col in range(ax.shape[1]):
@@ -48,7 +54,12 @@ def plot_accuracy_matrix(frame: mf.GlitchModel):
 def plot_precision_matrix(frame: mf.GlitchModel):
     matrix : np.ndarray = frame.con_matrix_per_epoch[-1]
     fig, ax = plt.subplots(1, 1, squeeze=False)
-    heatmap = sns.heatmap((matrix.T/np.sum(matrix.T, axis = 0)).T, 
+    
+    precision = du.get_precision(matrix)
+    
+    
+    
+    heatmap = sns.heatmap(precision, 
                 ax=ax[0,0],annot=True, fmt=".2f", cmap = 'coolwarm', xticklabels=range(matrix.shape[0]), yticklabels=range(matrix.shape[1]),cbar=False, vmin = 0, vmax = 1)
     for row in range(ax.shape[0]):
         for col in range(ax.shape[1]):

@@ -8,6 +8,7 @@ import numpy as np
 import os
 from IPython.display import display, clear_output
 import datautilities as du
+import json
 
 
 class GlitchModel():
@@ -186,6 +187,36 @@ class GlitchModel():
         
     def save_model(self, path, name):
         torch.save(self.model.state_dict(), os.path.join(path, name))
+        
+        settings_name = "model.json"
+        
+        settings_dict = {
+            "learning_rate" : self.learning_rate,
+            "number_of_epochs" : self.number_of_epochs,
+            "train_fraction_size" : self.train_set_fraction,
+            "validation_fraction_size" : self.validation_set_fraction,
+            "test_fraction_size" : self.test_set_fraction,
+            "class_weights" : self.class_weights.tolist(),
+            "label_weights" : self.label_weight_set,
+            "number_of_classes" : self.number_of_classes,
+            "network_class_name" : self.model.__class__.__name__
+        }
+        
+        
+        results_dict = {
+            "training_loss" : self.training_loss.tolist(),
+            "validation_loss" : self.validiation_loss.tolist(),
+            "confusion_matrix_per_epoch" : self.con_matrix_per_epoch.tolist(),
+            "confusion_matrix_test" : self.con_matrix.confusion_matrix.tolist()
+        }
+        
+        with open(os.path.join(path, "model_settings.json"), "w") as file:
+            json.dump(settings_dict, file, indent=4, separators=(',', ': '))
+            
+        with open(os.path.join(path, "model_results.json"), "w") as file:
+            json.dump(results_dict, file, indent=4, separators=(',', ': '))
+        
+        
         
     def save_settings(self):
         # Add code to save settings for easy loading of framework and module.

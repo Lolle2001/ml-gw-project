@@ -1,0 +1,25 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Glitch Amelioration in Gravitational Wave Signals
+message: >-
+  This code is for a project on using machine learning for
+  classification of gravitational wave signals into
+  different categories of origins, such as intermediate mass
+  black hole mergers.
+type: software
+authors:
+  - given-names: Iris
+    family-names: van Dijk
+  - given-names: Wouter
+    family-names: van Balken
+  - given-names: Lieuwe
+    family-names: Huisman
+repository-code: 'https://github.com/Lolle2001/ml-gw-project.git'
+abstract: |-
+  This code is for a project on using machine learning for
+    classification of gravitational wave signals into
+    different categories of origins, such as intermediate mass
+    black hole mergers.
+license: MIT

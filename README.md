@@ -13,3 +13,4 @@ This repository contains files for a machine learning project on intermediate ma
 ## :information_source: Project Script Setup
 
 The model consist out of a framework (`modelframe.py`) which contains the general settings and training loop for the different neural networks that are trained (`models.py`). The code includes two jupyter notebooks that run certain model setups and generate data. An additional notebook makes relevant plots of the model metrics. There are three additional python scripts that include code for plotting, data loading and other utilities.
+

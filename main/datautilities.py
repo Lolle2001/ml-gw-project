@@ -2,6 +2,10 @@
 import numpy as np
 import torch
 
+"""
+This script contains some general utility functions.
+"""
+
 def noise_data_reduction(features, labels, data_dict = {0:True, 1:False, 2:False, 3:False, 4:False, 5:False, 6:False}, noise_to_data_ratio = 1):
     
     

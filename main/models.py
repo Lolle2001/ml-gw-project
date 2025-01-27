@@ -6,6 +6,22 @@ import time
 import sklearn.utils as sku
 import numpy as np
 
+"""
+This script contains several classes containing a neural network structure. These classes can be given as an input to the "GlitchModel" class in "modelframe.py".
+
+Each class represents a different neural network architecture for glitch classification:
+- GlitchClassifier: A basic classifier with two hidden layers
+- GlitchClassifier_1: A deeper network with dropout
+- GlitchClassifier_2: A wider network with increasing then decreasing layer sizes
+- GlitchClassifier_3: A very deep network with multiple 256-neuron layers
+- GlitchClassifier_4: A network with three 350-neuron hidden layers
+- GlitchClassifier_MultiClass_Optimized: An optimized network with decreasing layer sizes
+- GlitchClassifierDynamic: A network with varying layer sizes
+
+These models can be used for binary or multi-class glitch classification tasks.
+"""
+
+
 class GlitchClassifier(nn.Module):
     def __init__(self, input_dim : int=6, hidden_dim :int=32, output_dim:int=2):
         super(GlitchClassifier, self).__init__()

@@ -10,6 +10,6 @@ This repository contains files for a machine learning project on intermediate ma
 * 📁 **info**: contains the documentation for this project.
 * 📁 **model**: contains the generated data, including settings and the neural network weights.
 
-## Project Script Setup
+## :information_source: Project Script Setup
 
-The model consist out of a framework (`modelframe.py`) which contains the general settings and training loop for the different neural networks that are trained (models.py). The models are ran in the scripts `main.ipynb`, `multiclass_network.ipynb` and `test_networks.ipynb`. Results and settings are stored and plotted.
+The model consist out of a framework (`modelframe.py`) which contains the general settings and training loop for the different neural networks that are trained (`models.py`). The code includes two jupyter notebooks that run certain model setups and generate data. An additional notebook makes relevant plots of the model metrics. There are three additional python scripts that include code for plotting, data loading and other utilities.

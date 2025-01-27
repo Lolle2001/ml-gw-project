@@ -7,6 +7,11 @@ from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import datautilities as du
 
+"""
+This script contains some general plot utilities.
+"""
+
+
 def plot_recall_matrix(frame : mf.GlitchModel):
     matrix : np.ndarray = frame.con_matrix_per_epoch[-1]
     fig, ax = plt.subplots(1, 1, squeeze=False)
